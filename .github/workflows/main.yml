@@ -1,0 +1,42 @@
+name: Deploy Discord Bot
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0'
+
+    - name: Publish .NET Discord Bot
+      run: dotnet publish -c Release -o ./publish
+
+    - name: Deploy to Remote Server
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        source: "./publish/*"
+        target: "/home/${{ secrets.SERVER_USER }}/discord-bot"
+        
+    - name: Run Bot on Remote Server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        script: |
+          cd /home/${{ secrets.SERVER_USER }}
+          pkill -f "dotnet JoyBot.dll" || true
+          nohup dotnet JoyBot.dll > bot.log 2>&1 &
