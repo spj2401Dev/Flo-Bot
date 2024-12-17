@@ -28,17 +28,10 @@ jobs:
         host: ${{ secrets.SERVER_IP }}
         username: ${{ secrets.SERVER_USER }}
         password: ${{ secrets.SERVER_PASSWORD }}
-        source: "./publish/*"
+        source: "./publish/*, ./Dockerfile"
         target: "/home/${{ secrets.SERVER_USER }}/discord-bot"
-        
-    - name: Run Bot on Remote Server
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SERVER_USER }}
-        password: ${{ secrets.SERVER_PASSWORD }}
-        script: |
-    - name: Run Bot on Remote Server
+
+    - name: Run Bot on Remote Server with Docker
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.SERVER_IP }}
@@ -46,5 +39,7 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         script: |
           cd /home/${{ secrets.SERVER_USER }}/discord-bot/publish
-          pkill -f "./JoyBoy" || true
-          nohup ./JoyBoy > bot.log 2>&1 &
+          docker stop discord-bot-container || true
+          docker rm discord-bot-container || true
+          docker build -t discord-bot .
+          docker run -d --name discord-bot-container discord-bot
