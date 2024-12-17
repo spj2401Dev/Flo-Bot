@@ -39,4 +39,5 @@ jobs:
         script: |
           cd /home/${{ secrets.SERVER_USER }}/discord-bot
           pkill -f "dotnet JoyBot.dll" || true
-          nohup dotnet JoyBot.dll > bot.log 2>&1 &
+          nohup dotnet JoyBot.dll &
+          disown
