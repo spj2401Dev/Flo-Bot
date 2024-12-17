@@ -56,7 +56,7 @@ public class DiscordService : BackgroundService
         if (_primaryGuild != null)
             return;
 
-        _primaryGuild = _discordSocketClient.Guilds.FirstOrDefault(x => x.Name == "");
+        _primaryGuild = _discordSocketClient.Guilds.FirstOrDefault(x => x.Name == "Bot Test");
 
         if (_primaryGuild == null)
             return;
